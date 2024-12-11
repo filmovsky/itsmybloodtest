@@ -1,6 +1,7 @@
 export default async function handler(req, res) {
     if (req.method === 'POST') {
         const apiKey = process.env.OPENAI_API_KEY;
+
         const response = await fetch('https://api.openai.com/v1/chat/completions', {
             method: 'POST',
             headers: {
@@ -8,19 +9,10 @@ export default async function handler(req, res) {
                 Authorization: `Bearer ${apiKey}`
             },
             body: JSON.stringify({
-                model: "gpt-4",
-                messages: [
-                    { role: "system", content: "You are an AI designed to analyze and interpret medical test results." },
-                    { role: "user", content: req.body.message }
-                ]
+                model: "gpt-3.5-turbo",
+                messages: req.body.messages
             })
         });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            res.status(response.status).json({ error: errorData });
-            return;
-        }
 
         const data = await response.json();
         res.status(200).json(data);
