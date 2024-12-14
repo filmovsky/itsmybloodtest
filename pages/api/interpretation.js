@@ -1,9 +1,8 @@
 import formidable from 'formidable';
-import fs from 'fs/promises';
 
 export const config = {
   api: {
-    bodyParser: false, // wyłączamy domyślny parser, bo używamy formidable
+    bodyParser: false,
   },
 };
 
@@ -17,7 +16,6 @@ export default async function handler(req, res) {
     return res.status(500).json({ message: 'Missing OPENAI_API_KEY in environment variables.' });
   }
 
-  // Parsowanie form-data za pomocą formidable
   const form = new formidable.IncomingForm({ multiples: true });
 
   form.parse(req, async (err, fields, files) => {
@@ -28,12 +26,6 @@ export default async function handler(req, res) {
 
     const { orderId, gender, age, height, weight, test, comments } = fields;
 
-    // Możesz obsłużyć pliki, jeśli chcesz je wykorzystać w promptcie:
-    // W tym przykładzie pomijamy analizę plików i zakładamy, że AI ich nie potrzebuje.
-    // Jeśli chcesz, możesz np. wyciągnąć tekst z plików PDF za pomocą tesseract.js lub innego narzędzia,
-    // a następnie dołączyć ten tekst do prompta.
-
-    // Budowanie prompta z uwzględnieniem wszystkich danych
     const prompt = `
 Analyze the following test results and patient details:
 
@@ -53,7 +45,6 @@ At the very end of your response, append the following disclaimer as a separate 
 "We know that the AI algorithms that power our service often interpret health data as accurately, or even more accurately, than doctors. However, due to legal requirements, we must inform you that: The service is fully automatic and based on AI. The information provided is educational and supportive and does not substitute professional medical advice. For any health decisions, consult a qualified healthcare professional."
     `;
 
-    // Wywołanie OpenAI API
     try {
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
